@@ -1,0 +1,230 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj": {}
+  },
+  "projects": {
+    "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj",
+        "projectName": "MediKartX.Application",
+        "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj",
+        "packagesPath": "/Users/pallavigupta/.nuget/packages/",
+        "outputPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/pallavigupta/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/MediKartX.Core.csproj": {
+                "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/MediKartX.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "EPPlus": {
+              "target": "Package",
+              "version": "[6.2.2, )"
+            },
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.417/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/MediKartX.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/MediKartX.Core.csproj",
+        "projectName": "MediKartX.Core",
+        "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/MediKartX.Core.csproj",
+        "packagesPath": "/Users/pallavigupta/.nuget/packages/",
+        "outputPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/pallavigupta/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.417/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj",
+        "projectName": "MediKartX.Infrastructure",
+        "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj",
+        "packagesPath": "/Users/pallavigupta/.nuget/packages/",
+        "outputPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/pallavigupta/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj": {
+                "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "EPPlus": {
+              "target": "Package",
+              "version": "[6.2.2, )"
+            },
+            "Flurl.Http": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
+            "Hangfire.Core": {
+              "target": "Package",
+              "version": "[1.8.23, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.23, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.23, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.23, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.417/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

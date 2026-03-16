@@ -1,0 +1,6 @@
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Tests/bin/Debug/net8.0/.msCoverageSourceRootsMapping_MediKartX.Tests
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Tests/obj/Debug/net8.0/MediKartX.Tests.csproj.AssemblyReference.cache
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Tests/obj/Debug/net8.0/MediKartX.Tests.GeneratedMSBuildEditorConfig.editorconfig
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Tests/obj/Debug/net8.0/MediKartX.Tests.AssemblyInfoInputs.cache
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Tests/obj/Debug/net8.0/MediKartX.Tests.AssemblyInfo.cs
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Tests/obj/Debug/net8.0/MediKartX.Tests.csproj.CoreCompileInputs.cache

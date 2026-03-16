@@ -1,0 +1,15 @@
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/bin/Debug/net8.0/MediKartX.Application.deps.json
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/bin/Debug/net8.0/MediKartX.Application.dll
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/bin/Debug/net8.0/MediKartX.Application.pdb
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/bin/Debug/net8.0/MediKartX.Core.dll
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/bin/Debug/net8.0/MediKartX.Core.pdb
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKartX.Application.csproj.AssemblyReference.cache
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKartX.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKartX.Application.AssemblyInfoInputs.cache
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKartX.Application.AssemblyInfo.cs
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKartX.Application.csproj.CoreCompileInputs.cache
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKart.1E8B0379.Up2Date
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKartX.Application.dll
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/refint/MediKartX.Application.dll
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/MediKartX.Application.pdb
+/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/obj/Debug/net8.0/ref/MediKartX.Application.dll

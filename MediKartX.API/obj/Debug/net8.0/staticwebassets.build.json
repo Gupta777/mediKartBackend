@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "BtGX9iVNgdDrIEqzPU3u4E1AWPVDBImNqNgzWSeREPM=",
+  "Source": "MediKartX.API",
+  "BasePath": "_content/MediKartX.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
