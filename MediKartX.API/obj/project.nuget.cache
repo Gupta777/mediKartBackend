@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "QLDHicrSJLE=",
+  "dgSpecHash": "IdwpwG852ug=",
   "success": true,
-  "projectFilePath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.API/MediKartX.API.csproj",
+  "projectFilePath": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.API/MediKartX.API.csproj",
   "expectedPackageFiles": [
     "/Users/pallavigupta/.nuget/packages/azure.core/1.38.0/azure.core.1.38.0.nupkg.sha512",
     "/Users/pallavigupta/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",

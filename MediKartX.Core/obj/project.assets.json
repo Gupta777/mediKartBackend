@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/MediKartX.Core.csproj",
+      "projectUniqueName": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Core/MediKartX.Core.csproj",
       "projectName": "MediKartX.Core",
-      "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/MediKartX.Core.csproj",
+      "projectPath": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Core/MediKartX.Core.csproj",
       "packagesPath": "/Users/pallavigupta/.nuget/packages/",
-      "outputPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Core/obj/",
+      "outputPath": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Core/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/pallavigupta/.nuget/NuGet/NuGet.Config"

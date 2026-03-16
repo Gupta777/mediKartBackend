@@ -4838,11 +4838,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj",
+      "projectUniqueName": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj",
       "projectName": "MediKartX.Infrastructure",
-      "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj",
+      "projectPath": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Infrastructure/MediKartX.Infrastructure.csproj",
       "packagesPath": "/Users/pallavigupta/.nuget/packages/",
-      "outputPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Infrastructure/obj/",
+      "outputPath": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Infrastructure/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/pallavigupta/.nuget/NuGet/NuGet.Config"
@@ -4857,8 +4857,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj": {
-              "projectPath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj"
+            "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Application/MediKartX.Application.csproj": {
+              "projectPath": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Application/MediKartX.Application.csproj"
             }
           }
         }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7oVKwYRXck4=",
+  "dgSpecHash": "vZRcU+43bFY=",
   "success": true,
-  "projectFilePath": "/Users/pallavigupta/Documents/MediKarts/MediKartBackend/MediKartX.Application/MediKartX.Application.csproj",
+  "projectFilePath": "/Users/pallavigupta/Documents/MediKarts_new/mediKartBackend/MediKartX.Application/MediKartX.Application.csproj",
   "expectedPackageFiles": [
     "/Users/pallavigupta/.nuget/packages/epplus/6.2.2/epplus.6.2.2.nupkg.sha512",
     "/Users/pallavigupta/.nuget/packages/epplus.interfaces/6.1.1/epplus.interfaces.6.1.1.nupkg.sha512",
