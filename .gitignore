@@ -1,0 +1,74 @@
+.env
+# =========================
+# .NET Core / .NET 8
+# =========================
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userprefs
+*.vs/
+*.ncrunch*
+*.resharper
+*.dotCover
+*.ReSharper*
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+appsettings.Development.json
+appsettings.Local.json
+*.pfx
+*.key
+*.cer
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+debug.log
+
+# =========================
+# Docker / Containers
+# =========================
+docker-compose.override.yml
+*.dockerfile
+docker-compose.override.yml
+*.env.*   # Any env files for microservices
+docker/
+volumes/
+tmp/
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.code-workspace
+
+# =========================
+# Node / Frontend (if Angular/React in microservice UI)
+# =========================
+node_modules/
+dist/
+build/
+npm-debug.log
+yarn-error.log
+
+# =========================
+# Temporary / Misc
+# =========================
+*.swp
+*.bak
+*.tmp
+*.DS_Store
+
+# =========================
+# Microservices logs / temp
+# =========================
+*.pid
+*.seed
+
