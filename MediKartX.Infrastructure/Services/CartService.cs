@@ -50,19 +50,19 @@ public class CartService : ICartService
 
     public async Task<(bool ok, string? error, CartDto? cart)> AddToCartAsync(AddToCartRequest req)
     {
-        // Resolve cart
+        // Resolve cart: prefer authenticated user's cart when UserId is present
         Cart? cart = null;
-        if (!string.IsNullOrWhiteSpace(req.GuestToken))
-            cart = await _db.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.GuestToken == req.GuestToken);
-        if (cart == null && req.UserId.HasValue)
+        if (req.UserId.HasValue)
             cart = await _db.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == req.UserId.Value);
+        if (cart == null && !string.IsNullOrWhiteSpace(req.GuestToken))
+            cart = await _db.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.GuestToken == req.GuestToken);
 
         if (cart == null)
         {
             cart = new Cart
             {
                 UserId = req.UserId ?? 0,
-                GuestToken = req.GuestToken,
+                GuestToken = req.UserId.HasValue ? null : req.GuestToken,
                 CreatedAt = DateTime.UtcNow
             };
             _db.Carts.Add(cart);

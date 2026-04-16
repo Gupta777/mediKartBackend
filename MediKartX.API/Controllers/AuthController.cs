@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using MediKartX.Application.Interfaces;
 using MediKartX.Application.DTOs;
+using MediKartX.Application.Constants;
+using MediKartX.Application.Enums;
 
 namespace MediKartX.API.Controllers;
 
@@ -30,7 +32,7 @@ public class AuthController : ControllerBase
             var resp = new ApiResponse<object>
             {
                 Success = false,
-                Message = "Request OTP failed",
+                Message = ApiMessages.Get(ApiMessageKey.RequestOtpFailed),
                 Errors = new[] { result.Message ?? string.Empty },
                 Data = null,
                 StatusCode = 400
@@ -51,7 +53,7 @@ public class AuthController : ControllerBase
             var resp = new ApiResponse<object>
             {
                 Success = false,
-                Message = "Verify OTP failed",
+                Message = ApiMessages.Get(ApiMessageKey.VerifyOtpFailed),
                 Errors = new[] { result.Message ?? string.Empty },
                 Data = null,
                 StatusCode = 400
@@ -60,7 +62,7 @@ public class AuthController : ControllerBase
         }
 
         var data = new { token = result.Token, expiresInMinutes = result.ExpiresInMinutes, roles = result.Roles };
-        return Ok(new ApiResponse<object> { Success = true, Message = "Authentication successful", Data = data, Errors = null, StatusCode = 200 });
+        return Ok(new ApiResponse<object> { Success = true, Message = ApiMessages.Get(ApiMessageKey.AuthenticationSuccessful), Data = data, Errors = null, StatusCode = 200 });
     }
 
     [HttpPost("verify-otp-admin")]
@@ -72,7 +74,7 @@ public class AuthController : ControllerBase
             var resp = new ApiResponse<object>
             {
                 Success = false,
-                Message = "Verify OTP failed",
+                Message = ApiMessages.Get(ApiMessageKey.VerifyOtpFailed),
                 Errors = new[] { result.Message ?? string.Empty },
                 Data = null,
                 StatusCode = 400
@@ -86,8 +88,8 @@ public class AuthController : ControllerBase
             var resp = new ApiResponse<object>
             {
                 Success = false,
-                Message = "Forbidden",
-                Errors = new[] { "User is not an admin" },
+                Message = ApiMessages.Get(ApiMessageKey.Forbidden),
+                Errors = new[] { ApiMessages.Get(ApiMessageKey.UserNotAdmin) },
                 Data = null,
                 StatusCode = 403
             };
@@ -95,7 +97,7 @@ public class AuthController : ControllerBase
         }
 
         var data = new { token = result.Token, expiresInMinutes = result.ExpiresInMinutes, roles = result.Roles };
-        return Ok(new ApiResponse<object> { Success = true, Message = "Admin authentication successful", Data = data, Errors = null, StatusCode = 200 });
+        return Ok(new ApiResponse<object> { Success = true, Message = ApiMessages.Get(ApiMessageKey.AdminAuthenticationSuccessful), Data = data, Errors = null, StatusCode = 200 });
     }
 }
 

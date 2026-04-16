@@ -61,6 +61,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 // Register application services (Onion: Application -> Infrastructure)
 builder.Services.AddScoped<MediKartX.Application.Interfaces.IAuthService, MediKartX.Infrastructure.Services.AuthService>();
 builder.Services.AddScoped<MediKartX.Application.Interfaces.ISmsSender, MediKartX.Infrastructure.Services.TwilioSmsSender>();
@@ -96,6 +97,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Authorization policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
+
 var app = builder.Build();
 
 // ==============================
@@ -112,7 +119,11 @@ if (app.Environment.IsDevelopment())
 }
 
 // Enable CORS
-app.UseCors("AllowAll");
+app.UseCors(builder =>
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader()
+);
 
 // Serve static files (Angular dist)
 app.UseStaticFiles();

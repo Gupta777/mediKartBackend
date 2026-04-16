@@ -5,7 +5,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: medikart_db
     environment:
-      SA_PASSWORD: "Your_strong!Passw0rd"
+      SA_PASSWORD: "Pass@123"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
@@ -20,7 +20,7 @@ services:
     depends_on:
       - db
     environment:
-      - DB_CONNECTION=Server=db,1433;Database=MediKartX;User Id=sa;Password=Your_strong!Passw0rd;TrustServerCertificate=True;
+      - DB_CONNECTION=Server=db,1433;Database=MediKartX;User Id=sa;Password=Pass@123;TrustServerCertificate=True;
       - JWT_KEY=${JWT_KEY}
       - JWT_ISSUER=${JWT_ISSUER}
       - JWT_AUDIENCE=${JWT_AUDIENCE}
