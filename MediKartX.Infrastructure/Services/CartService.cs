@@ -48,56 +48,81 @@ public class CartService : ICartService
         return dto;
     }
 
-    public async Task<(bool ok, string? error, CartDto? cart)> AddToCartAsync(AddToCartRequest req)
+   public async Task<(bool ok, string? error, CartDto? cart)> AddToCartAsync(AddToCartRequest req)
+{
+    // STEP 1: Get Medicine
+    var med = await _db.Medicines.FirstOrDefaultAsync(m => m.MedicineId == req.MedicineId);
+
+    if (med == null) return (false, "Medicine not found", null);
+    if ((bool)!med.IsActive) return (false, "Medicine is inactive", null);
+    if (med.Stock < req.Quantity) return (false, "Insufficient stock", null);
+
+    Cart? cart = null;
+
+    // STEP 2: Logged-in user cart
+    if (req.UserId.HasValue)
     {
-        // Resolve cart: prefer authenticated user's cart when UserId is present
-        Cart? cart = null;
-        if (req.UserId.HasValue)
-            cart = await _db.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == req.UserId.Value);
-        if (cart == null && !string.IsNullOrWhiteSpace(req.GuestToken))
-            cart = await _db.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.GuestToken == req.GuestToken);
-
-        if (cart == null)
-        {
-            cart = new Cart
-            {
-                UserId = req.UserId ?? 0,
-                GuestToken = req.UserId.HasValue ? null : req.GuestToken,
-                CreatedAt = DateTime.UtcNow
-            };
-            _db.Carts.Add(cart);
-            await _db.SaveChangesAsync();
-        }
-
-        var med = await _db.Medicines.FirstOrDefaultAsync(m => m.MedicineId == req.MedicineId);
-        if (med == null) return (false, "Medicine not found", null);
-        if (med.IsActive == false) return (false, "Medicine is inactive", null);
-        if (med.Stock < req.Quantity) return (false, "Insufficient stock", null);
-
-        var existing = cart.CartItems.FirstOrDefault(ci => ci.MedicineId == req.MedicineId);
-        if (existing != null)
-        {
-            var newQty = existing.Quantity + req.Quantity;
-            if (med.Stock < newQty) return (false, "Insufficient stock for combined quantity", null);
-            existing.Quantity = newQty;
-            existing.UpdatedAt = DateTime.UtcNow;
-        }
-        else
-        {
-            cart.CartItems.Add(new CartItem
-            {
-                MedicineId = req.MedicineId,
-                Quantity = req.Quantity,
-                CreatedAt = DateTime.UtcNow
-            });
-        }
-
-        await _db.SaveChangesAsync();
-        var dto = await GetCartAsync(cart.GuestToken, cart.UserId == 0 ? (int?)null : cart.UserId);
-        return (true, null, dto);
+        cart = await _db.Carts
+            .Include(c => c.CartItems)
+            .FirstOrDefaultAsync(c => c.UserId == req.UserId.Value);
+    }
+    // STEP 3: Guest cart
+    else if (!string.IsNullOrWhiteSpace(req.GuestToken))
+    {
+        cart = await _db.Carts
+            .Include(c => c.CartItems)
+            .FirstOrDefaultAsync(c => c.GuestToken == req.GuestToken);
     }
 
-    public async Task<(bool ok, string? error, CartDto? cart)> RemoveItemAsync(int cartItemId, string? guestToken, int? userId)
+    // STEP 4: Create cart if not exists
+    if (cart == null)
+    {
+        cart = new Cart
+        {
+            UserId = req.UserId??0,
+            GuestToken = req.UserId.HasValue ? null : req.GuestToken,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            CartItems = new List<CartItem>()
+        };
+
+        _db.Carts.Add(cart);
+        await _db.SaveChangesAsync();
+    }
+
+    // STEP 5: Add or update item
+    var existing = cart.CartItems.FirstOrDefault(x => x.MedicineId == req.MedicineId);
+
+    if (existing != null)
+    {
+        var newQty = existing.Quantity + req.Quantity;
+
+        if (med.Stock < newQty)
+            return (false, "Insufficient stock for combined quantity", null);
+
+        existing.Quantity = newQty;
+        existing.UpdatedAt = DateTime.UtcNow;
+    }
+    else
+    {
+        cart.CartItems.Add(new CartItem
+        {
+            MedicineId = req.MedicineId,
+            Quantity = req.Quantity,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        });
+    }
+
+    cart.UpdatedAt = DateTime.UtcNow;
+
+    await _db.SaveChangesAsync();
+
+    var dto = await GetCartAsync(req.GuestToken, req.UserId);
+
+    return (true, null, dto);
+}
+ public async Task<(bool ok, string? error, CartDto? cart)> RemoveItemAsync(int cartItemId, string? guestToken, int? userId)
     {
         CartItem? item = null;
         if (!string.IsNullOrWhiteSpace(guestToken))
@@ -113,46 +138,63 @@ public class CartService : ICartService
         return (true, null, dto);
     }
 
-    public async Task<(bool ok, string? error)> MergeGuestCartAsync(string guestToken, int userId)
+ public async Task<(bool ok, string? error)> MergeGuestCartAsync(string guestToken, int userId)
+{
+    var guestCart = await _db.Carts
+        .Include(c => c.CartItems)
+        .FirstOrDefaultAsync(c => c.GuestToken == guestToken);
+
+    if (guestCart == null)
+        return (false, "Guest cart not found");
+
+    var userCart = await _db.Carts
+        .Include(c => c.CartItems)
+        .FirstOrDefaultAsync(c => c.UserId == userId);
+
+    if (userCart == null)
     {
-        if (string.IsNullOrWhiteSpace(guestToken)) return (false, "guestToken required");
-        var guestCart = await _db.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.GuestToken == guestToken);
-        if (guestCart == null) return (false, "Guest cart not found");
-        var userCart = await _db.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
-        if (userCart == null)
+        userCart = new Cart
         {
-            userCart = new Cart { UserId = userId, CreatedAt = DateTime.UtcNow };
-            _db.Carts.Add(userCart);
-            await _db.SaveChangesAsync();
-        }
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            CartItems = new List<CartItem>()
+        };
 
-        foreach (var gi in guestCart.CartItems.ToList())
-        {
-            var med = await _db.Medicines.FindAsync(gi.MedicineId);
-            if (med == null || med.IsActive == false) continue; // skip
-            var existing = userCart.CartItems.FirstOrDefault(ci => ci.MedicineId == gi.MedicineId);
-            if (existing != null)
-            {
-                var combined = existing.Quantity + gi.Quantity;
-                if (med.Stock < combined)
-                {
-                    existing.Quantity = Math.Min(med.Stock, combined);
-                }
-                else existing.Quantity = combined;
-                existing.UpdatedAt = DateTime.UtcNow;
-            }
-            else
-            {
-                var qty = Math.Min(gi.Quantity, med.Stock);
-                userCart.CartItems.Add(new CartItem { MedicineId = gi.MedicineId, Quantity = qty, CreatedAt = DateTime.UtcNow });
-            }
-            // remove guest item
-            _db.CartItems.Remove(gi);
-        }
-
-        // remove guest cart
-        _db.Carts.Remove(guestCart);
+        _db.Carts.Add(userCart);
         await _db.SaveChangesAsync();
-        return (true, null);
     }
+
+    // STEP 1: Merge items
+    foreach (var item in guestCart.CartItems.ToList())
+    {
+        var existing = userCart.CartItems
+            .FirstOrDefault(x => x.MedicineId == item.MedicineId);
+
+        if (existing != null)
+        {
+            existing.Quantity += item.Quantity;
+            existing.UpdatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            userCart.CartItems.Add(new CartItem
+            {
+                MedicineId = item.MedicineId,
+                Quantity = item.Quantity,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+        }
+
+        _db.CartItems.Remove(item);
+    }
+
+    // STEP 2: delete guest cart
+    _db.Carts.Remove(guestCart);
+
+    await _db.SaveChangesAsync();
+
+    return (true, null);
+}
 }
