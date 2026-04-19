@@ -5,7 +5,72 @@ using MediKartX.Application.Interfaces;
 using MediKartX.Application.DTOs;
 
 namespace MediKartX.API.Controllers;
+[ApiController]
+[Route("api/[controller]")]
+public class OrderController : ControllerBase
+{
+    private readonly IOrderService _svc;
 
+    public OrderController(IOrderService svc)
+    {
+        _svc = svc;
+    }
+
+    // ✅ PLACE ORDER
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> PlaceOrder(PlaceOrderRequest req)
+    {
+        var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+        req.UserId = userId;
+
+        var result = await _svc.PlaceOrderAsync(req);
+
+        if (!result.ok)
+        {
+            return BadRequest(new ApiResponse<object>
+            {
+                Success = false,
+                Message = result.error ?? "Order failed",
+                Errors = new[] { result.error ?? "Unknown error" },
+                StatusCode = 400,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+
+        return Ok(new ApiResponse<OrderDto>
+        {
+            Success = true,
+            Message = "Order placed successfully",
+            Data = result.order,
+            StatusCode = 200,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
+    // ✅ GET USER ORDERS
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetMyOrders()
+    {
+        var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+
+        var orders = await _svc.GetUserOrdersAsync(userId);
+
+        return Ok(new ApiResponse<OrderDto[]>
+        {
+            Success = true,
+            Message = "Orders retrieved",
+            Data = orders,
+            StatusCode = 200,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+}
+
+
+
+/*
 [ApiController]
 [Route("api/[controller]")]
 public class OrderController : ControllerBase
@@ -57,3 +122,4 @@ public class OrderController : ControllerBase
         return Ok(new ApiResponse<object> { Success = true, Message = "Order status updated", StatusCode = 200 });
     }
 }
+*/

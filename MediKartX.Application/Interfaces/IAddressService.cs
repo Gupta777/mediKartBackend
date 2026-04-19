@@ -4,7 +4,9 @@ using MediKartX.Application.DTOs;
 namespace MediKartX.Application.Interfaces;
 public interface IAddressService
 {
-    Task<List<AddressDto>> GetAsync(int userId);
-    Task<AddressDto> AddAsync(int userId, AddressRequest req);
-    Task<bool> DeleteAsync(int addressId, int userId);
+    Task<List<AddressDto>> GetUserAddressesAsync(int userId);
+    Task<AddressDto?> AddAddressAsync(int userId, AddAddressRequest req);
+    Task<bool> UpdateAddressAsync(int userId, UpdateAddressRequest req);
+    Task<bool> DeleteAddressAsync(int userId, int addressId);
+    Task<bool> SetDefaultAddressAsync(int userId, int addressId);
 }

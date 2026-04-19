@@ -8,7 +8,189 @@ using MediKartX.Infrastructure.Data;
 
 namespace MediKartX.Infrastructure.Services;
 
+
 public class OrderService : IOrderService
+{
+    private readonly MediKartXDbContext _db;
+
+    public OrderService(MediKartXDbContext db)
+    {
+        _db = db;
+    }
+
+    public async Task<(bool ok, string? error, OrderDto? order)> PlaceOrderAsync(PlaceOrderRequest req)
+    {
+        if (req.Items == null || !req.Items.Any())
+            return (false, "Cart is empty", null);
+
+        var medicines = await _db.Medicines
+            .Where(m => req.Items.Select(i => i.MedicineId).Contains(m.MedicineId))
+            .ToListAsync();
+
+        decimal total = 0;
+
+        // ✅ Validate stock + calculate total
+        foreach (var item in req.Items)
+        {
+            var med = medicines.FirstOrDefault(m => m.MedicineId == item.MedicineId);
+            if (med == null)
+                return (false, $"Medicine {item.MedicineId} not found", null);
+
+            if (med.Stock < item.Quantity)
+                return (false, $"Insufficient stock for {med.Name}", null);
+
+            total += med.SellingPrice * item.Quantity;
+        }
+
+        // ✅ Apply coupon
+        if (!string.IsNullOrEmpty(req.CouponCode))
+        {
+            var coupon = await _db.Coupons
+                .FirstOrDefaultAsync(c => c.Code == req.CouponCode && (bool)c.IsActive);
+
+            if (coupon == null || coupon.ExpiryDate < DateTime.UtcNow)
+                return (false, "Invalid or expired coupon", null);
+
+            total -= (total * coupon.DiscountPercent / 100);
+
+            _db.CouponUsages.Add(new CouponUsage
+            {
+                CouponId = coupon.CouponId,
+                UserId = req.UserId,
+                UsedAt = DateTime.UtcNow
+            });
+        }
+
+        // ✅ Create Order
+        var order = new Order
+        {
+            UserId = req.UserId,
+            TotalAmount = total,
+            PaymentMode = req.PaymentMode ?? "COD",
+            OrderStatus = "Placed",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _db.Orders.Add(order);
+        await _db.SaveChangesAsync();
+
+        // ✅ Order Items
+        foreach (var item in req.Items)
+        {
+            var med = medicines.First(m => m.MedicineId == item.MedicineId);
+
+            _db.OrderItems.Add(new OrderItem
+            {
+                OrderId = order.OrderId,
+                MedicineId = item.MedicineId,
+                Quantity = item.Quantity,
+                Price = med.SellingPrice
+            });
+
+            // reduce stock
+            med.Stock -= item.Quantity;
+
+            _db.StockHistories.Add(new StockHistory
+            {
+                MedicineId = med.MedicineId,
+                PreviousStock = med.Stock + item.Quantity,
+                ChangedStock = med.Stock,
+                Reason = "Order placed"
+            });
+        }
+
+        // ✅ Payment entry
+        _db.PaymentTransactions.Add(new PaymentTransaction
+        {
+            OrderId = order.OrderId,
+            PaymentMode = order.PaymentMode,
+            PaymentStatus = order.PaymentMode == "COD" ? "Pending" : "Paid",
+            Amount = total
+        });
+
+        // ✅ Reward points (simple logic)
+        var reward = await _db.Rewards.FirstOrDefaultAsync(r => r.UserId == req.UserId);
+        if (reward == null)
+        {
+            reward = new Reward { UserId = req.UserId, Points = 0 };
+            _db.Rewards.Add(reward);
+        }
+
+        int earnedPoints = (int)(total / 10); // 10₹ = 1 point
+        reward.Points += earnedPoints;
+
+        _db.RewardTransactions.Add(new RewardTransaction
+        {
+            RewardId = reward.RewardId,
+            OrderId = order.OrderId,
+            PointsChanged = earnedPoints,
+            Reason = "Order reward"
+        });
+
+        // ✅ Shipment (manual for now)
+        _db.Shipments.Add(new Shipment
+        {
+            OrderId = order.OrderId,
+            CourierName = "Manual Delivery",
+            Status = "Pending",
+            EstimatedDeliveryDate =DateOnly.FromDateTime(DateTime.UtcNow).AddDays(3)    
+        });
+
+        await _db.SaveChangesAsync();
+
+        // ✅ Response DTO
+        var dto = new OrderDto
+        {
+            OrderId = order.OrderId,
+            UserId = order.UserId,
+            TotalAmount = order.TotalAmount,
+            PaymentMode = order.PaymentMode,
+            OrderStatus = order.OrderStatus,
+            CreatedAt = order.CreatedAt,
+            Items = await _db.OrderItems
+                .Where(x => x.OrderId == order.OrderId)
+                .Include(x => x.Medicine)
+                .Select(x => new OrderItemDto
+                {
+                    OrderItemId = x.OrderItemId,
+                    MedicineId = x.MedicineId,
+                    MedicineName = x.Medicine.Name,
+                    Quantity = x.Quantity,
+                    Price = x.Price
+                }).ToArrayAsync()
+        };
+
+        return (true, null, dto);
+    }
+
+    public async Task<OrderDto[]> GetUserOrdersAsync(int userId)
+    {
+        return await _db.Orders
+            .Where(o => o.UserId == userId)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Medicine)
+            .Select(o => new OrderDto
+            {
+                OrderId = o.OrderId,
+                UserId = o.UserId,
+                TotalAmount = o.TotalAmount,
+                PaymentMode = o.PaymentMode,
+                OrderStatus = o.OrderStatus,
+                CreatedAt = o.CreatedAt,
+                Items = o.OrderItems.Select(i => new OrderItemDto
+                {
+                    OrderItemId = i.OrderItemId,
+                    MedicineId = i.MedicineId,
+                    MedicineName = i.Medicine.Name,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToArray()
+            }).ToArrayAsync();
+    }
+
+    /*updated code
+    public class OrderService : IOrderService
 {
     private readonly MediKartXDbContext _db;
     private readonly ICouponService _couponSvc;
@@ -162,4 +344,7 @@ public class OrderService : IOrderService
             return (false, ex.Message);
         }
     }
+}
+    */
+    
 }

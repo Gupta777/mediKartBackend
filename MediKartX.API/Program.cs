@@ -72,6 +72,9 @@ builder.Services.AddScoped<MediKartX.Application.Interfaces.ICategoryService, Me
 builder.Services.AddScoped<MediKartX.Application.Interfaces.ICouponService, MediKartX.Infrastructure.Services.CouponService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<MediKartX.Application.Interfaces.IOrderService, MediKartX.Infrastructure.Services.OrderService>();
+builder.Services.AddScoped<MediKartX.Application.Interfaces.IWishlistService, MediKartX.Infrastructure.Services.WishlistService>();
+builder.Services.AddScoped<MediKartX.Application.Interfaces.IReviewService, MediKartX.Infrastructure.Services.ReviewService>();
+
 builder.Services.AddScoped<MediKartX.Application.Interfaces.IAdminDashboardService, MediKartX.Infrastructure.Services.AdminDashboardService>();
 
 // ==============================

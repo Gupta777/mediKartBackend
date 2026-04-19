@@ -5,32 +5,36 @@ using MediKartX.Application.Interfaces;
 using MediKartX.Application.DTOs;
 
 namespace MediKartX.API.Controllers;
+
 [ApiController]
-[Route("api/address")]
+[Route("api/[controller]")]
 [Authorize]
 public class AddressController : ControllerBase
 {
-    private readonly IAddressService _svc;
+    private readonly IAddressService _service;
 
-    public AddressController(IAddressService svc)
+    public AddressController(IAddressService service)
     {
-        _svc = svc;
+        _service = service;
     }
 
     private int GetUserId()
     {
-        return int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+        return int.Parse(
+            User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+        );
     }
 
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var data = await _svc.GetAsync(GetUserId());
+        var userId = GetUserId();
+        var data = await _service.GetUserAddressesAsync(userId);
 
         return Ok(new ApiResponse<List<AddressDto>>
         {
             Success = true,
-            Message = "Address list retrieved",
+            Message = "Addresses retrieved",
             Data = data,
             StatusCode = 200,
             Timestamp = DateTime.UtcNow
@@ -38,9 +42,10 @@ public class AddressController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add(AddressRequest req)
+    public async Task<IActionResult> Add(AddAddressRequest req)
     {
-        var data = await _svc.AddAsync(GetUserId(), req);
+        var userId = GetUserId();
+        var data = await _service.AddAddressAsync(userId, req);
 
         return Ok(new ApiResponse<AddressDto>
         {
@@ -52,10 +57,11 @@ public class AddressController : ControllerBase
         });
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    [HttpPut]
+    public async Task<IActionResult> Update(UpdateAddressRequest req)
     {
-        var ok = await _svc.DeleteAsync(id, GetUserId());
+        var userId = GetUserId();
+        var ok = await _service.UpdateAddressAsync(userId, req);
 
         if (!ok)
             return NotFound(new ApiResponse<object>
@@ -69,8 +75,48 @@ public class AddressController : ControllerBase
         return Ok(new ApiResponse<object>
         {
             Success = true,
-            Message = "Address deleted",
-            StatusCode = 200
+            Message = "Address updated successfully",
+            StatusCode = 200,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
+    [HttpDelete("{addressId}")]
+    public async Task<IActionResult> Delete(int addressId)
+    {
+        var userId = GetUserId();
+        var ok = await _service.DeleteAddressAsync(userId, addressId);
+
+        if (!ok)
+            return NotFound(new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Address not found",
+                Errors = new[] { "Invalid addressId" },
+                StatusCode = 404
+            });
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Message = "Address deleted successfully",
+            StatusCode = 200,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
+    [HttpPost("set-default/{addressId}")]
+    public async Task<IActionResult> SetDefault(int addressId)
+    {
+        var userId = GetUserId();
+        await _service.SetDefaultAddressAsync(userId, addressId);
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Message = "Default address updated",
+            StatusCode = 200,
+            Timestamp = DateTime.UtcNow
         });
     }
 }
