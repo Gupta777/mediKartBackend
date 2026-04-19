@@ -163,83 +163,101 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResultDto> VerifyOtpAsync(VerifyOtpRequest request)
+public async Task<AuthResultDto> VerifyOtpAsync(VerifyOtpRequest request)
+{
+    if (string.IsNullOrWhiteSpace(request.MobileNumber) && string.IsNullOrWhiteSpace(request.Email))
+        return new AuthResultDto { Success = false, Message = "Provide mobileNumber or email" };
+
+    string identifier = request.MobileNumber ?? request.Email!;
+
+    var otplog = _db.Otplogs
+        .Where(o => o.MobileNumber == identifier && o.IsUsed == false)
+        .OrderByDescending(o => o.CreatedAt)
+        .FirstOrDefault();
+
+    if (otplog == null)
+        return new AuthResultDto { Success = false, Message = "OTP not found or already used" };
+
+    if (otplog.ExpiryTime < DateTime.UtcNow)
+        return new AuthResultDto { Success = false, Message = "OTP expired" };
+
+    if (otplog.Otpcode != request.OtpCode)
     {
-        if (string.IsNullOrWhiteSpace(request.MobileNumber) && string.IsNullOrWhiteSpace(request.Email))
-            return new AuthResultDto { Success = false, Message = "Provide mobileNumber or email" };
-
-        string identifier = request.MobileNumber ?? request.Email!;
-
-        var otplog = _db.Otplogs
-            .Where(o => o.MobileNumber == identifier && o.IsUsed == false)
-            .OrderByDescending(o => o.CreatedAt)
-            .FirstOrDefault();
-
-        if (otplog == null)
-            return new AuthResultDto { Success = false, Message = "OTP not found or already used" };
-
-        if (otplog.ExpiryTime < DateTime.UtcNow)
-            return new AuthResultDto { Success = false, Message = "OTP expired" };
-
-        if (otplog.Otpcode != request.OtpCode)
-        {
-            otplog.AttemptCount = (otplog.AttemptCount ?? 0) + 1;
-            otplog.AttemptedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
-            return new AuthResultDto { Success = false, Message = "Invalid OTP" };
-        }
-
-        otplog.IsUsed = true;
-        otplog.UpdatedAt = DateTime.UtcNow;
+        otplog.AttemptCount = (otplog.AttemptCount ?? 0) + 1;
+        otplog.AttemptedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
-        var user = _db.Users.Find(otplog.UserId);
-        if (user != null)
-        {
-            user.IsMobileVerified = true;
-            user.LastLoginAt = DateTime.UtcNow;
-            user.UpdatedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
-        }
-
-        // gather roles for the user
-        var roles = _db.UserRoles
-            .Where(ur => ur.UserId == user!.UserId)
-            .Select(ur => ur.Role.RoleName)
-            .ToArray();
-
-        // create JWT
-        string jwtKey = _cfg["JWT_KEY"] ?? Environment.GetEnvironmentVariable("JWT_KEY")!;
-        string jwtIssuer = _cfg["JWT_ISSUER"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER")!;
-        string jwtAudience = _cfg["JWT_AUDIENCE"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE")!;
-        int jwtExpires = int.Parse(_cfg["JWT_EXPIRES_MINUTES"] ?? Environment.GetEnvironmentVariable("JWT_EXPIRES_MINUTES") ?? "60");
-
-        var keyBytes = Encoding.ASCII.GetBytes(jwtKey);
-        var tokenHandler = new JwtSecurityTokenHandler();
-
-        var claims = new[] {
-            new Claim(ClaimTypes.NameIdentifier, user?.UserId.ToString() ?? string.Empty),
-            new Claim(ClaimTypes.MobilePhone, user?.MobileNumber ?? string.Empty),
-            new Claim(ClaimTypes.Email, user?.Email ?? string.Empty)
-        }.ToList();
-
-        foreach (var r in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, r));
-        }
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(jwtExpires),
-            Issuer = jwtIssuer,
-            Audience = jwtAudience,
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
-        };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
-
-        return new AuthResultDto { Success = true, Token = tokenString, ExpiresInMinutes = jwtExpires, Roles = roles };
+        return new AuthResultDto { Success = false, Message = "Invalid OTP" };
     }
+
+    // ✅ Mark OTP used
+    otplog.IsUsed = true;
+    otplog.UpdatedAt = DateTime.UtcNow;
+    await _db.SaveChangesAsync();
+
+    // ✅ Get user
+    var user = await _db.Users.FindAsync(otplog.UserId);
+
+    if (user == null)
+        return new AuthResultDto { Success = false, Message = "User not found" };
+
+    // ✅ Update user
+    user.IsMobileVerified = true;
+    user.LastLoginAt = DateTime.UtcNow;
+    user.UpdatedAt = DateTime.UtcNow;
+    await _db.SaveChangesAsync();
+
+    // ✅ Get roles
+    var roles = _db.UserRoles
+        .Where(ur => ur.UserId == user.UserId)
+        .Select(ur => ur.Role.RoleName)
+        .ToArray();
+
+    // ================= JWT =================
+    string jwtKey = _cfg["JWT_KEY"] ?? Environment.GetEnvironmentVariable("JWT_KEY")!;
+    string jwtIssuer = _cfg["JWT_ISSUER"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER")!;
+    string jwtAudience = _cfg["JWT_AUDIENCE"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE")!;
+    int jwtExpires = int.Parse(_cfg["JWT_EXPIRES_MINUTES"] ?? Environment.GetEnvironmentVariable("JWT_EXPIRES_MINUTES") ?? "60");
+
+    var keyBytes = Encoding.ASCII.GetBytes(jwtKey);
+    var tokenHandler = new JwtSecurityTokenHandler();
+
+    var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // ✅ UserId in JWT
+        new Claim(ClaimTypes.MobilePhone, user.MobileNumber ?? ""),
+        new Claim(ClaimTypes.Email, user.Email ?? "")
+    };
+
+    foreach (var role in roles)
+    {
+        claims.Add(new Claim(ClaimTypes.Role, role));
+    }
+
+    var tokenDescriptor = new SecurityTokenDescriptor
+    {
+        Subject = new ClaimsIdentity(claims),
+        Expires = DateTime.UtcNow.AddMinutes(jwtExpires),
+        Issuer = jwtIssuer,
+        Audience = jwtAudience,
+        SigningCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(keyBytes),
+            SecurityAlgorithms.HmacSha256Signature
+        )
+    };
+
+    var token = tokenHandler.CreateToken(tokenDescriptor);
+    var tokenString = tokenHandler.WriteToken(token);
+
+    // ✅ FINAL RESPONSE WITH USERID
+    return new AuthResultDto
+    {
+        Success = true,
+        Message = "Login successful",
+        Token = tokenString,
+        ExpiresInMinutes = jwtExpires,
+        Roles = roles,
+        UserId = user.UserId  
+    };
+}
 }

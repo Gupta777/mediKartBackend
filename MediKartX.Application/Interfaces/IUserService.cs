@@ -6,6 +6,6 @@ namespace MediKartX.Application.Interfaces;
 public interface IUserService
 {
     Task<ApiResponse<UserDto>> GetUserByIdAsync(int userId);
-    
-
+    Task<UserProfileDto?> GetProfileAsync(int userId);
+Task<ApiResponse<object>> UpdateProfileAsync(int userId, UserProfileDto dto);
 }

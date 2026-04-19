@@ -67,6 +67,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("verify-otp-admin")]
     public async Task<ActionResult<ApiResponse<object>>> VerifyOtpAdmin([FromBody] VerifyOtpRequest req)
+
     {
         var result = await _authService.VerifyOtpAsync(req);
         if (!result.Success)
@@ -99,5 +100,9 @@ public class AuthController : ControllerBase
         var data = new { token = result.Token, expiresInMinutes = result.ExpiresInMinutes, roles = result.Roles };
         return Ok(new ApiResponse<object> { Success = true, Message = ApiMessages.Get(ApiMessageKey.AdminAuthenticationSuccessful), Data = data, Errors = null, StatusCode = 200 });
     }
+
+
+   
+   
 }
 

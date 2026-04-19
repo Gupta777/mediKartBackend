@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MediKartX.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80c1fd246f90a663c694d341177e41b3fff75a75")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+abf5a69c8b447ac730432e080592b7595b7c089b")]
 [assembly: System.Reflection.AssemblyProductAttribute("MediKartX.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MediKartX.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

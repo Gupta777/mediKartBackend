@@ -21,4 +21,5 @@ public class AuthResultDto
     public string? Token { get; set; }
     public int? ExpiresInMinutes { get; set; }
     public string[]? Roles { get; set; }
+    public int? UserId { get; set; }
 }

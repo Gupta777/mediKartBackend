@@ -17,17 +17,25 @@ public class CartController : ControllerBase
         _cartService = cartService;
     }
 
+    // ✅ COMMON METHOD
+    private int? GetUserId()
+    {
+        if (User.Identity?.IsAuthenticated != true)
+            return null;
+
+        var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+        if (claim == null || !int.TryParse(claim.Value, out int userId))
+            return null;
+
+        return userId;
+    }
+
+    // ================= GET CART =================
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] string? guestToken = null)
     {
-        int? userId = null;
-
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            var idClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(idClaim, out var parsed))
-                userId = parsed;
-        }
+        var userId = GetUserId();
 
         var cart = await _cartService.GetCartAsync(guestToken, userId);
 
@@ -41,15 +49,28 @@ public class CartController : ControllerBase
             Timestamp = DateTime.UtcNow
         });
     }
-    [HttpPost("merge")]
+
+    // ================= MERGE CART =================
     [Authorize]
+    [HttpPost("merge")]
     public async Task<IActionResult> Merge([FromBody] string guestToken)
     {
-        var userId = int.Parse(
-            User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-        );
+        var userId = GetUserId();
 
-        var result = await _cartService.MergeGuestCartAsync(guestToken, userId);
+        if (userId == null)
+        {
+            return Unauthorized(new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Invalid token",
+                Data = null,
+                Errors = new[] { "Unauthorized" },
+                StatusCode = 401,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+
+        var result = await _cartService.MergeGuestCartAsync(guestToken, userId.Value);
 
         if (!result.ok)
         {
@@ -74,17 +95,12 @@ public class CartController : ControllerBase
             Timestamp = DateTime.UtcNow
         });
     }
+
+    // ================= REMOVE ITEM =================
     [HttpDelete("item/{cartItemId}")]
     public async Task<IActionResult> Remove(int cartItemId, [FromQuery] string? guestToken = null)
     {
-        int? userId = null;
-
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            var idClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(idClaim, out var parsed))
-                userId = parsed;
-        }
+        var userId = GetUserId();
 
         var (ok, error, cart) = await _cartService.RemoveItemAsync(cartItemId, guestToken, userId);
 
@@ -112,17 +128,28 @@ public class CartController : ControllerBase
         });
     }
 
-
-
+    // ================= ADD TO CART =================
     [HttpPost("add")]
-    public async Task<IActionResult> Add(AddToCartRequest req)
+    public async Task<IActionResult> Add([FromBody] AddToCartRequest req)
     {
-        if (User.Identity?.IsAuthenticated == true)
+        if (req == null)
         {
-            var userId = int.Parse(
-                User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-            );
-            req.UserId = userId;
+            return BadRequest(new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Invalid request",
+                Data = null,
+                Errors = new[] { "Request body is required" },
+                StatusCode = 400,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+
+        var userId = GetUserId();
+
+        if (userId != null)
+        {
+            req.UserId = userId.Value;
         }
 
         var result = await _cartService.AddToCartAsync(req);

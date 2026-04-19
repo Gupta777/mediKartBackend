@@ -46,7 +46,7 @@ builder.Services.AddDbContext<MediKartXDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
 
 // ==============================
 // CORS Configuration
@@ -74,6 +74,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<MediKartX.Application.Interfaces.IOrderService, MediKartX.Infrastructure.Services.OrderService>();
 builder.Services.AddScoped<MediKartX.Application.Interfaces.IWishlistService, MediKartX.Infrastructure.Services.WishlistService>();
 builder.Services.AddScoped<MediKartX.Application.Interfaces.IReviewService, MediKartX.Infrastructure.Services.ReviewService>();
+builder.Services.AddScoped<MediKartX.Application.Interfaces.IUserService, MediKartX.Infrastructure.Services.UserService>();
 
 builder.Services.AddScoped<MediKartX.Application.Interfaces.IAdminDashboardService, MediKartX.Infrastructure.Services.AdminDashboardService>();
 
